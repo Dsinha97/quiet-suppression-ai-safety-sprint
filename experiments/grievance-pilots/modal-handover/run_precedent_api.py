@@ -17,11 +17,30 @@ tokens that came back (`thought_tokens`), so thinking can be audited per read.
 from __future__ import annotations
 
 import json
+import hashlib
 import re
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+
+def _input_hashes(system, user):
+    """Hash the exact strings passed to the provider, before the call."""
+    return {"system_sha256": hashlib.sha256(system.encode("utf-8")).hexdigest(),
+            "user_sha256": hashlib.sha256(user.encode("utf-8")).hexdigest()}
+
+
+def _check_input_row(row):
+    hashes = _input_hashes(row["system"], row["user"])
+    for key, value in hashes.items():
+        if key in row and row[key] != value:
+            raise ValueError("supplied full input hash disagrees: " + key)
+    if row.get("system_sha") and row["system_sha"] != hashes["system_sha256"][:16]:
+        raise ValueError("stored system hash disagrees")
+    # Legacy exports have stale user_sha values. Preserve these as source hashes;
+    # fresh outputs use the computed hashes. The archived input file is unchanged.
+    return hashes
+
 
 import modal
 
@@ -104,6 +123,7 @@ def _run(tag: str, rows: list[dict], budget_left: float):
         if stop[0]:
             return None
         try:
+            input_hashes = _check_input_row(r)
             x = fn(model, r["system"], r["user"], thinking, state)
         except Exception as e:  # noqa: BLE001
             return {"row": r, "rep": k, "error": f"{type(e).__name__}: {str(e)[:300]}"}
@@ -112,7 +132,7 @@ def _run(tag: str, rows: list[dict], budget_left: float):
             spent[0] += cost
             if spent[0] >= budget_left:
                 stop[0] = True
-        return {"row": r, "rep": k, "cost": cost, **x}
+        return {"row": r, "rep": k, "cost": cost, "input_hashes": input_hashes, **x}
 
     jobs = [(r, k) for r in rows for k in range(REPS)]
     with ThreadPoolExecutor(WORKERS) as ex:
@@ -150,13 +170,27 @@ def _parse(text: str, finish) -> dict:
 
 @app.local_entrypoint()
 def main(model: str, smoke: bool = False, prompt_set: str = "precedent", budget: float = 1.0, suffix: str = ""):
-    rows = [json.loads(l) for l in (HERE / f"{prompt_set}_prompts.jsonl").read_text(encoding="utf-8").splitlines() if l.strip()]
+    prompt_path = HERE / f"{prompt_set}_prompts.jsonl"
+    prompt_bytes = prompt_path.read_bytes()
+    prompt_file_sha256 = hashlib.sha256(prompt_bytes).hexdigest()
+    rows = [json.loads(l) for l in prompt_bytes.decode("utf-8").splitlines() if l.strip()]
+    for row in rows:
+        _check_input_row(row)
+        row["prompt_file_sha256"] = prompt_file_sha256
     if smoke:
         rows = rows[:2] + rows[-2:]
     provider, repo = MODELS[model][0], MODELS[model][1]
     fn = run_anthropic if provider == "anthropic" else run_gemini
     out = HERE / "results" / (model + suffix) / f"{prompt_set}_arms"
     out.mkdir(parents=True, exist_ok=True)
+    for row in rows:
+        expected = _check_input_row(row)
+        for k in range(REPS):
+            saved = out / f"{row['arm']}__{row['item']}__r{k}.json"
+            if saved.exists():
+                prior = json.loads(saved.read_text(encoding="utf-8"))
+                if any(prior.get(key) != value for key, value in expected.items()):
+                    raise ValueError("resume input mismatch or legacy output: use a new --suffix")
     todo = [r for r in rows if not all((out / f"{r['arm']}__{r['item']}__r{k}.json").exists() for k in range(REPS))]
     print(f"{model}{suffix}: {len(rows)} prompts x {REPS} draws, {len(todo)} to run, budget ${budget:.2f}")
     spent = 0.0
@@ -177,7 +211,10 @@ def main(model: str, smoke: bool = False, prompt_set: str = "precedent", budget:
                 "stratum": r["stratum"], "model": repo, "endpoint": f"{provider}-api via modal",
                 "temperature": TEMP, "temperature_applied": x["temperature_applied"], "thinking": x["thinking"],
                 "thought_tokens": x["thought_tokens"], "max_tokens": MAX_TOKENS,
-                "system_sha": r["system_sha"], "user_sha": r["user_sha"],
+                "system_sha": x["input_hashes"]["system_sha256"][:16], "user_sha": x["input_hashes"]["user_sha256"][:16],
+                **x["input_hashes"], "source_user_sha": r.get("user_sha"),
+                "source_user_hash_matches": r.get("user_sha") == x["input_hashes"]["user_sha256"][:16],
+                "prompt_file_sha256": r["prompt_file_sha256"],
                 "flag": p.get("flag"), "suspicion": p.get("suspicion"), "reason": p.get("reason"),
                 "flag_missing": "flag" not in p, "finish": x["finish"], "cost_usd": round(x["cost"], 6),
                 "usage": {"prompt_tokens": x["in"], "completion_tokens": x["out"]},

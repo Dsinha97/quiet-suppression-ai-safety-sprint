@@ -15,3 +15,20 @@ python experiments/grievance-pilots/rebuild_watchdog_audit.py > watchdog-counts.
 Intervals treat reads as independent and do not account for repeated draws and shared complaints. They are descriptive, not evidence of significance or generalization to new complaints. This release does not repair the absence of held-out, human-checked labels.
 
 Original-provider precedent rows exclude the initial C2 cases, following the published cross-model analysis. Some arms have fewer saved reads: Nemotron has 285 harder-set reads, while the Opus and Sol precedent runs cover arm C only. The analysis reports saved reads, with missing flags counted as not flagged; it does not reconstruct failed calls.
+
+
+## Recomputed historical hashes
+
+All 18,633 rows now include `recomputed_user_sha256`, `recomputed_system_sha256`, `input_hash_provenance`, and `prompt_file_sha256`. Original-provider user strings were reconstructed from archived trajectories using the historical formatting, with all recorded 16-character user-hash prefixes matching. `archived_user_sha256` remains blank for those rows to distinguish them from scrubbed exported text. The reconstructed strings are not included in this release. Exported-run recomputed hashes come from the archived JSONL strings; the stored system hashes, user source hashes and labels were checked when joining the observations. `prompt_file_sha256` identifies the frozen exported file for API/Modal rows and is blank for originals. Hashing is UTF-8 with no whitespace normalization.
+
+To repeat the historical correction with private inputs:
+
+```text
+python experiments/grievance-pilots/recompute_historical_hashes.py --trajectory-dir /path/to/trajectories --prompt-dir /path/to/frozen-prompts --output observations-recomputed.csv
+```
+
+Historical reconstruction and archived-input joins do not prove the bytes a provider received. The revised API and Modal runners compute fresh full hashes from the exact system and user strings before the call, preserve legacy user hashes as `source_user_sha`, and record the full prompt-file hash. A mismatching supplied full hash raises. Existing historical output directories cannot be silently overwritten; the API runner rejects legacy or mismatched input hashes on resume, and the Modal runner requires an empty output folder. Use a new suffix for fresh runs. No historical raw output or frozen input file was modified.
+
+An empty `flag` cell is a missing parsed flag, not an affirmative or a negative decision. Analyses retain it in the denominator and count only `True` as flagged, following the submitted convention. No historical labels are replaced with the later human record judgments.
+
+Run `python experiments/grievance-pilots/test_watchdog_release.py` for offline checks of input hashes and row identity, plus the 13-model interval criterion. The tests invoke no provider or GPU service.
