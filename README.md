@@ -58,3 +58,7 @@ Most starter routes are API-only and run on a laptop. Use Modal for fanning out 
 The submitted report is [`docs/report/Quiet-Suppression-report.pdf`](docs/report/Quiet-Suppression-report.pdf).
 
 It follows the sprint's format: PDF on the official Apart template, at most 8 pages plus references and appendices, a 150-250 word abstract, a **Limitations and Dual-Use / Ethical Considerations** appendix, and an LLM usage statement (`docs/LLM_USAGE.md`).
+
+### Text-free watchdog audit data
+
+`data/watchdog-audit/` contains per-read original-provider, API and Modal observations, an archived-input hash sidecar, and instructions to rebuild descriptive counts. It covers a subset of the report, not every table; see its README for provenance and limitations.
