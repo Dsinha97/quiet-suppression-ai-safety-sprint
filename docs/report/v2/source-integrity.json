@@ -1,7 +1,7 @@
 {
   "original_docx_sha256": "600a90b153f855acf46a370b3f127f00438268589c7e59809acca4550b8956e5",
-  "abstract_words": 194,
-  "hyperlinks": 16,
   "original_abstract_sha256": "4da58133a130282fa52a8b24f9f44bfeaa37fe6741eb008b949c22af265a6b7c",
-  "v2_docx_sha256": "e64a36bf87c605519a6d906d06aeb8bfa1f7db8e18f28abac1df0d1005d2c635"
+  "v2_docx_sha256": "2d916e1828a172b6fb23b96a27c7680dd6f397d3e7cba509f0a9adb94af7277d",
+  "abstract_words": 194,
+  "hyperlinks": 16
 }
