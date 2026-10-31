@@ -1,0 +1,21 @@
+case_id,case_group,severity,escalation,rationale_verbatim,candidate_text_sha256
+R02,historical,1,no,"Still just clarifying purpose of the call, no real information about whatever is to be reported yet",
+R12,historical,1,no,"Still just clarifying purpose of the call, no real information about whatever is to be reported yet",
+R11,historical,3,yes,"Report of workplace discrimination w.r.t. procurement and promotions favouring foreign contractors over loca candicates. Left unattended could become a festering cause of resentment affecting worker conditions, performance, and potentially spilling over to broader reputational risk to the project for failing to effectively address local content requirements.",
+R13,historical,3,yes,Report unpaid overtime. If true indicates clear breech of contract conditions - rights and legal issue that must be addressed.,
+R14,historical,3,yes,"Report of what, if accurate, suggests at minimum Procedurally Unfair Dismissal as no appropriate procedures were followed. Potentially Wrongful/ Unfair dismissal to be investigated further.",
+R31,historical,3,yes,"Transcript extract cropped short, but appears to indicate potential retaliation against an employee for reporting a potential safety concern. Left unattended could have dire implications for saffety culture across project as the impression that reporting risks will get shifts cut will stop them being reported.",
+R35,historical,3,yes,Potentially garbled transcript that makes little sense but could suggest a potentially serious issue. At minimum the system should be checked for more information on the record.,
+R36,historical,3,yes,report of possible workplace fraud - legal repercussions,
+H01,candidate,4,yes,"Safety risk if shift ends after transport home provided, potentially  requiring worker to travel alone after dark through potentially unsafe areas.",7a1025feff61aa3edaf07a444192395ec44a71eaa9f00ae1e1ae19448d13e266
+H02,candidate,4,yes,safety risk - faulty equipment,79586f69aa26dd751efa0d447ea0305452955dc7a22b17e3f7750b29c8c7980e
+H03,candidate,3,yes,potential rights implications related to payroll deduction,09b584186a11db950eb7581b8ca66798b7dd6b31e4365579a26776d8cb1b4df9
+H04,candidate,4,yes,Clear case of retaliatory tthreats combined with payment concerns suggesting workplace abuse of authority.,107f5f892c181e5d84f1246db62eecf1035d3f8d55b7684bd0625f07e54b1e7f
+H05,candidate,3,yes,"wo0rkplace conditions requilting in indirect, likely unintended yet still effective discrimination  against night shift workers",c047c7f491a028807c779d1df2382015b2163777d3106ea9248acd70c9b5832f
+H06,candidate,4,yes,Health/safety risk 7 harm to children caused by environmental impacts.,2f2f7e661470554fe5f061539eee478c14fd0f6c9121c98f8ad3c7defb8a07a8
+H07,candidate,4,yes,at minimum ensure the repair does happen by tomorrow though earlier would be better as situation appears to be a potential immediate safety risk though noone's been injured yet.,08689a725aeca4a911b3017f28769690afb9766850b591088e51ace5a7a1b916
+H08,candidate,3,yes,sexual discdrimination in the workplace - clear rights abuse and legal issue to be investigated,2fc7161df1f139beabbbc8181046185d0ea84a26ebcdae0e9cb9019983e0ac32
+H09,candidate,2,unclear,"Catering for vegetarians is commonly considered standard practice in workplace settings so should be addressed, though not an immediate critical crisis. May need escalation if not addressed by the scheduled Friday.",ea529f5953959c0c6633fa3ac905b6e8308223592706e33cacc0163a5c818414
+H10,candidate,4,yes,Clear workplace safety hazard requirring urgent attention,b02ab04db143861fcf42e562a100517f195391e667ca402319c700ad0e35ab18
+H11,candidate,1,unclear,"Broader context required. Best practice workplace etique might suggest such explanation would be nice to have, but not a clear requirement the company would likely be compelled to provide.",bd5b07d42141a7ecdafe6088a96492096fc7ae77752b091a3cac734004b497bb
+H12,candidate,2,unclear,"If community will be impacted, appropriate public consultation prior to impacts would be essential.",019b38340e7ae39abdee709549396c371f0525b91eeaaba908fccd98e5d28de7

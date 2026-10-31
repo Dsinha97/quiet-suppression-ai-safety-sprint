@@ -62,3 +62,5 @@ It follows the sprint's format: PDF on the official Apart template, at most 8 pa
 ### Text-free watchdog audit data
 
 `data/watchdog-audit/` contains per-read original-provider, API and Modal observations, an archived-input hash sidecar, and instructions to rebuild descriptive counts. It covers a subset of the report, not every table; see its README for provenance and limitations.
+
+Revision preparation, regenerated tables and the human rating pass are in `docs/revision-prep/` and `data/human-review/`. The human-review README explains why the new candidate cases are not yet a held-out evaluation and why publishing the answer key before testing risks contamination.

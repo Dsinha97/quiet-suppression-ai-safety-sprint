@@ -1,0 +1,7 @@
+C2: 6/12 substantiated
+C3: 8/12 substantiated
+W0c: 8/12 substantiated
+C4: 3/12 substantiated
+Q2c: 4/12 substantiated
+R4: 4/12 substantiated
+S4: 8/12 substantiated
