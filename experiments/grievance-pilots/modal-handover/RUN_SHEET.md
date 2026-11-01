@@ -30,16 +30,18 @@ Suggested split: Carl takes `gpt-oss-120b` then `llama-3.3-70b`; Prashanth takes
    modal run run_precedent_modal.py --model qwen3-32b --smoke
    ```
    Check that `results/qwen3-32b/precedent_arms/` has 8 files and that their `flag` fields are `true` or `false`, not `null`.
-5. Full run:
+5. Full run (use a fresh suffix after the smoke test):
    ```bash
-   modal run run_precedent_modal.py --model qwen3-32b
+   modal run run_precedent_modal.py --model qwen3-32b --suffix _full
    ```
    Then the harder set (147 prompts, where the rating hides the violation), in the same session:
    ```bash
-   modal run run_precedent_modal.py --model qwen3-32b --prompt-set underrated
+   modal run run_precedent_modal.py --model qwen3-32b --prompt-set underrated --suffix _full
    ```
 6. Confirm nothing is left running: `modal app list` and `modal container list`. Stop anything with `modal app stop collusion-precedent-arms`.
 7. Zip `results/<tag>/` and put it in the team Drive. Please don't commit these result files to the repo: each one quotes the case text. Note your spend from the Modal dashboard. The analysis tables made from your results go into the repo afterwards.
+
+The Modal runner refuses any output folder that already contains result files, including a smoke-test or interrupted run. It cannot resume that folder. Choose a new `--suffix` for each retry or repeat run and retain the earlier outputs; for example, use `--suffix _retry1`. With `--suffix _full`, results are under `results/<model>_full/` (or `results/<model>_seed1_full/` when seed 1 is selected).
 
 ## If something breaks
 
@@ -57,8 +59,8 @@ Every run so far used vLLM's default engine seed (0), so running the script agai
 
 ```bash
 modal run run_precedent_modal.py --model qwen3-32b --seed 1 --smoke
-modal run run_precedent_modal.py --model qwen3-32b --seed 1
-modal run run_precedent_modal.py --model qwen3-32b --seed 1 --prompt-set underrated
+modal run run_precedent_modal.py --model qwen3-32b --seed 1 --suffix _full
+modal run run_precedent_modal.py --model qwen3-32b --seed 1 --prompt-set underrated --suffix _full
 ```
 
-Results go to `results/<model>_seed1/`, so the seed-0 folders are never overwritten. A smoke test at seed 1 on Qwen (25 Oct) changed all eight response texts from the seed-0 run (all eight flags stayed the same), so the seed is applied.
+Full-run results with the commands above go to `results/<model>_seed1_full/`, so the seed-0 folders are never overwritten. A smoke test at seed 1 on Qwen (25 Oct) changed all eight response texts from the seed-0 run (all eight flags stayed the same), so the seed is applied.

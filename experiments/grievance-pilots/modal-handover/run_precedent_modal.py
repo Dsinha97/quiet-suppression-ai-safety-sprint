@@ -20,8 +20,27 @@ is saved with flag_missing=true, never scored from a draft answer.
 from __future__ import annotations
 
 import json
+import hashlib
 import re
 from pathlib import Path
+
+def _input_hashes(system, user):
+    """Hash the exact strings passed to the provider, before the call."""
+    return {"system_sha256": hashlib.sha256(system.encode("utf-8")).hexdigest(),
+            "user_sha256": hashlib.sha256(user.encode("utf-8")).hexdigest()}
+
+
+def _check_input_row(row):
+    hashes = _input_hashes(row["system"], row["user"])
+    for key, value in hashes.items():
+        if key in row and row[key] != value:
+            raise ValueError("supplied full input hash disagrees: " + key)
+    if row.get("system_sha") and row["system_sha"] != hashes["system_sha256"][:16]:
+        raise ValueError("stored system hash disagrees")
+    # Legacy exports have stale user_sha values. Preserve these as source hashes;
+    # fresh outputs use the computed hashes. The archived input file is unchanged.
+    return hashes
+
 
 import modal
 
@@ -56,11 +75,12 @@ def _batch(tag: str, rows: list[dict], seed: int = 0) -> list[dict]:
     llm = LLM(model=repo, max_model_len=max_len, **extra, **({"seed": seed} if seed else {}))
     params = SamplingParams(temperature=TEMP, max_tokens=max_tokens, n=REPS)
     convs = [[{"role": "system", "content": r["system"]}, {"role": "user", "content": r["user"]}] for r in rows]
+    input_hashes = [_check_input_row(row) for row in rows]
     outs = llm.chat(convs, params)
     res = []
-    for r, o in zip(rows, outs):
+    for r, o, hashes in zip(rows, outs, input_hashes):
         for k, c in enumerate(o.outputs):
-            res.append({"row": r, "rep": k, "content": c.text, "finish": c.finish_reason,
+            res.append({"row": r, "input_hashes": hashes, "rep": k, "content": c.text, "finish": c.finish_reason,
                         "prompt_tokens": len(o.prompt_token_ids), "completion_tokens": len(c.token_ids)})
     return res
 
@@ -101,21 +121,32 @@ def _parse(text: str, finish: str | None) -> dict:
 
 
 @app.local_entrypoint()
-def main(model: str, smoke: bool = False, prompt_set: str = "precedent", seed: int = 0):
-    rows = [json.loads(l) for l in (HERE / f"{prompt_set}_prompts.jsonl").read_text(encoding="utf-8").splitlines() if l.strip()]
+def main(model: str, smoke: bool = False, prompt_set: str = "precedent", seed: int = 0, suffix: str = ""):
+    prompt_path = HERE / f"{prompt_set}_prompts.jsonl"
+    prompt_bytes = prompt_path.read_bytes()
+    prompt_file_sha256 = hashlib.sha256(prompt_bytes).hexdigest()
+    rows = [json.loads(l) for l in prompt_bytes.decode("utf-8").splitlines() if l.strip()]
+    for row in rows:
+        _check_input_row(row)
+        row["prompt_file_sha256"] = prompt_file_sha256
     if smoke:
         rows = rows[:2] + rows[-2:]
     gpu = MODELS[model][1]
     fn = run_a100 if gpu.startswith("A100") else run_h200 if gpu == "H200" else run_h100
     print(f"{model} on {gpu}: {len(rows)} prompts x {REPS} draws, engine seed {seed}")
-    out = HERE / "results" / (f"{model}_seed{seed}" if seed else model) / f"{prompt_set}_arms"
+    out = HERE / "results" / ((f"{model}_seed{seed}" if seed else model) + suffix) / f"{prompt_set}_arms"
     out.mkdir(parents=True, exist_ok=True)
+    if any(out.glob("*.json")):
+        raise ValueError("output folder contains historical results: use a new --suffix")
     for x in fn.remote(model, rows, seed):
         r = x["row"]; p = _parse(x["content"], x["finish"])
         (out / f"{r['arm']}__{r['item']}__r{x['rep']}.json").write_text(json.dumps({
             "arm": r["arm"], "item": r["item"], "record": r["record"], "rep": x["rep"], "label": r["label"],
             "stratum": r["stratum"], "model": MODELS[model][0], "endpoint": f"modal-vllm/{gpu}",
-            "temperature": TEMP, "seed": seed, "system_sha": r["system_sha"], "user_sha": r["user_sha"],
+            "temperature": TEMP, "seed": seed, "system_sha": x["input_hashes"]["system_sha256"][:16], "user_sha": x["input_hashes"]["user_sha256"][:16],
+                **x["input_hashes"], "source_user_sha": r.get("user_sha"),
+                "source_user_hash_matches": r.get("user_sha") == x["input_hashes"]["user_sha256"][:16],
+                "prompt_file_sha256": r["prompt_file_sha256"],
             "flag": p.get("flag"), "suspicion": p.get("suspicion"), "reason": p.get("reason"),
             "flag_missing": "flag" not in p, "finish": x["finish"],
             "usage": {"prompt_tokens": x["prompt_tokens"], "completion_tokens": x["completion_tokens"]},

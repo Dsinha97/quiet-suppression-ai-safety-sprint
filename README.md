@@ -58,3 +58,12 @@ Most starter routes are API-only and run on a laptop. Use Modal for fanning out 
 The submitted report is [`docs/report/Quiet-Suppression-report.pdf`](docs/report/Quiet-Suppression-report.pdf).
 
 It follows the sprint's format: PDF on the official Apart template, at most 8 pages plus references and appendices, a 150-250 word abstract, a **Limitations and Dual-Use / Ethical Considerations** appendix, and an LLM usage statement (`docs/LLM_USAGE.md`).
+
+### Text-free watchdog audit data
+
+`data/watchdog-audit/` contains per-read original-provider, API and Modal observations, an archived-input hash sidecar, and instructions to rebuild descriptive counts. It covers a subset of the report, not every table; see its README for provenance and limitations.
+
+Revision preparation, regenerated tables and the human rating pass are in `docs/revision-prep/` and `data/human-review/`. The human-review README identifies H01–H12 as exposed development or practice cases, retired from blind held-out use. A future held-out test needs fresh cases with ratings kept private until the evaluation is frozen and run.
+
+
+The [dated v2 report](docs/report/v2/Quiet-Suppression-report-v2.pdf) and its editable source are separate from the original submission. See the [review response](docs/revision-prep/REVIEW-RESPONSE.md) for changes, validation, and research that remains future work. The team agreed to publish v2 alongside the unchanged Apart submission. Publication of v2 is independent of Apart’s submission-update policy.

@@ -58,3 +58,8 @@ In this repository copy, `cached-trajectories/run_pipeline.py` reads the records
 - Raw reasoning text from `run_thinking_arms.py` quotes case text and stays out of the repo with the other per-call results; Kimi K2 0905 has no thinking control and 79 of its 618 reads still used reasoning tokens (provider routing).
 - In `run_precedent_arms.py`, the first launch also ran honest C2 cases with no notes stage; `analyse_precedent_arms.py` drops them, and C1 attempts failed by design.
 - The glass-channel arm (G4 in `run_lifecycle.py`) appends “the lender reads every note” to channel text that says the lender never sees notes, so G4 results come from conflicting instructions.
+
+
+## Post-submission revision package
+
+`docs/report/v2/` contains the dated 1 November revision, separate from the submitted PDF. `data/watchdog-audit/` supplies text-free per-read observations and recomputed historical hashes. `docs/revision-prep/REVIEW-RESPONSE.md` maps the review requests to the changes and outstanding research. Both Modal runners now record freshly computed input hashes in new results and guard against legacy-output reuse. The original freezes and observations are preserved; no new inference is required to rebuild the released watchdog counts.
