@@ -63,7 +63,7 @@ It follows the sprint's format: PDF on the official Apart template, at most 8 pa
 
 `data/watchdog-audit/` contains per-read original-provider, API and Modal observations, an archived-input hash sidecar, and instructions to rebuild descriptive counts. It covers a subset of the report, not every table; see its README for provenance and limitations.
 
-Revision preparation, regenerated tables and the human rating pass are in `docs/revision-prep/` and `data/human-review/`. The human-review README explains why the new candidate cases are not yet a held-out evaluation and why publishing the answer key before testing risks contamination.
+Revision preparation, regenerated tables and the human rating pass are in `docs/revision-prep/` and `data/human-review/`. The human-review README identifies H01–H12 as exposed development or practice cases, retired from blind held-out use. A future held-out test needs fresh cases with ratings kept private until the evaluation is frozen and run.
 
 
 The [dated v2 report](docs/report/v2/Quiet-Suppression-report-v2.pdf) and its editable source are separate from the original submission. See the [review response](docs/revision-prep/REVIEW-RESPONSE.md) for changes, validation, and research that remains future work. Updating the Apart submission or publishing v2 on the project site awaits the team’s decision after Apart confirms its update policy.
