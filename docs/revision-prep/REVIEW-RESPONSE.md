@@ -1,6 +1,6 @@
 # Response to the first Quiet Suppression review
 
-Prepared 1 November 2026. The original submission remains at `docs/report/Quiet-Suppression-report.pdf`. The dated revision is in `docs/report/v2/`. Apart’s update policy and the judges’ access to later versions are not confirmed here; no submission or project-site replacement was made.
+Prepared 1 November 2026. The original submission remains at `docs/report/Quiet-Suppression-report.pdf`. The dated revision is in `docs/report/v2/`. The team agreed to publish v2 alongside the unchanged Apart submission. The judges’ access to later versions is not confirmed here.
 
 | Review request | Revision and evidence |
 |---|---|
@@ -20,4 +20,4 @@ The PDF was rebuilt with the retained Apart template, exported through Word and 
 
 The original logs do not contain a historical send-time capture. The release identifies inputs from the available archives and matched original hashes, and states that limitation. Some other pilot tables and refusal details require private raw files; the table inventory lists that boundary. The released observations permit offline reconstruction of the covered watchdog tables, not every experiment in the report. The wider held-out evaluation requires a frozen protocol and future runs; it is outside this correction package.
 
-The team should decide where to publish the revised report after Apart confirms its policy. This branch is prepared for review, with the original submission preserved. Swarm design, labeling and dates are unchanged by this work.
+The agreed publication plan is to publish v2 alongside the unchanged Apart submission. It does not depend on Apart confirming a submission-update policy. This branch remains prepared for review. Swarm design, labeling and dates are unchanged by this work.
